@@ -1,0 +1,28 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # checkout the repository
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3"
+          architecture: "x64"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-linux.txt
+      - name: build
+        run: |
+          pyinstaller --noconsole --onefile --add-data "pluto.ui:." main.py
+          mv dist/main dist/hades_save_editor
+      - name: Upload linux build
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: |
+            dist/
